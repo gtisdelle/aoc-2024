@@ -1,0 +1,27 @@
+use std::fs::read_to_string;
+
+fn main() {
+    let args: Vec<String> = std::env::args().collect();
+    let filepath = &args[1];
+
+    let instructions = read_to_string(filepath).expect("file should open");
+
+    let mut i: usize = 0;
+    while i < instructions.len() {
+        if instructions.chars().nth(i).unwrap() != 'm' {
+            i += 1;
+            continue;
+        }
+
+        let candidate = &instructions[i..]
+            .chars()
+            .take_while(|c| *c != ')')
+            .collect::<Vec<char>>();
+
+        if is_mul(candidate) {}
+
+        i += candidate.len();
+    }
+}
+
+fn is_mul(candidate: &Vec<char>) -> bool {}
