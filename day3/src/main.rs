@@ -8,7 +8,23 @@ fn main() {
 
     let mut sum = 0;
     let mut i: usize = 0;
+    let mut enabled = true;
     while i < instructions.len() {
+        if instructions[i..].starts_with("do()") {
+            enabled = true;
+        }
+
+        if instructions[i..].starts_with("don't()") {
+            enabled = false;
+        }
+
+        // dbg!(enabled);
+
+        if !enabled {
+            i += 1;
+            continue;
+        }
+
         if instructions.chars().nth(i).unwrap() != 'm' {
             i += 1;
             continue;
