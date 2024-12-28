@@ -1,7 +1,9 @@
 use std::{collections::HashMap, fs::read_to_string};
 
 fn main() {
-    let file_path = "/home/gtisdelle/source/repos/aoc_2024/day1/input.txt";
+    let args: Vec<String> = std::env::args().collect();
+    let file_path = &args[1];
+
     let mut left: Vec<i32> = Vec::new();
     let mut right: Vec<i32> = Vec::new();
     for line in read_to_string(file_path).unwrap().lines() {
