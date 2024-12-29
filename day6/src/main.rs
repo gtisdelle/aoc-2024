@@ -263,7 +263,7 @@ fn to_matrix(puzzle: String) -> Vec<Vec<char>> {
     puzzle.lines().map(|line| line.chars().collect()).collect()
 }
 
-fn print_map(map: &Vec<Vec<char>>) {
+fn _print_map(map: &Vec<Vec<char>>) {
     for row in map {
         for letter in row {
             print!("{letter}");
