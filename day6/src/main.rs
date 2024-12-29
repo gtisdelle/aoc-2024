@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone)]
 enum Direction {
     Left,
     Right,
@@ -8,13 +8,13 @@ enum Direction {
     Down,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Position {
     x: isize,
     y: isize,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Guard {
     position: Position,
     direction: Direction,
@@ -25,10 +25,11 @@ fn main() {
     let path = &args[1];
     let puzzle = std::fs::read_to_string(path).expect("file should be read to a string");
 
-    part_1(puzzle);
+    // _part_1(puzzle);
+    part_2(puzzle);
 }
 
-fn part_1(puzzle: String) {
+fn _part_1(puzzle: String) {
     let puzzle = to_matrix(puzzle);
     let mut unique_positions: HashSet<(isize, isize)> = HashSet::new();
     let mut guard = find_guard(&puzzle).expect("guard should be in puzzle");
@@ -42,6 +43,60 @@ fn part_1(puzzle: String) {
     }
 
     dbg!(unique_positions.len());
+}
+
+fn part_2(puzzle: String) {
+    let puzzle = to_matrix(puzzle);
+
+    let mut cycle_count = 0;
+
+    let init_guard = find_guard(&puzzle).expect("guard should be in puzzle");
+
+    let maps = gen_maps(&puzzle, &init_guard.position);
+    // let maps = vec![puzzle.clone()];
+    // for map in &maps {
+    //     print_map(&map);
+    //     println!();
+    // }
+    for map in maps {
+        let mut states: HashSet<(isize, isize, Direction)> = HashSet::new();
+        let mut guard = init_guard.clone();
+        while is_within_map(&map, &guard.position) {
+            // dbg!(&guard);
+            if states.contains(&(guard.position.x, guard.position.y, guard.clone().direction)) {
+                cycle_count += 1;
+                print_map(&map);
+                println!();
+                break;
+            }
+
+            states.insert((guard.position.x, guard.position.y, guard.clone().direction));
+
+            guard = travel(&map, guard);
+        }
+
+        //dbg!(cycle_count);
+        //dbg!(states);
+    }
+
+    dbg!(cycle_count);
+}
+
+fn gen_maps(puzzle: &Vec<Vec<char>>, guard_starting_pos: &Position) -> Vec<Vec<Vec<char>>> {
+    let mut maps: Vec<Vec<Vec<char>>> = Vec::new();
+    for y in 0..puzzle.len() {
+        for x in 0..puzzle[0].len() {
+            if guard_starting_pos.x as usize == x && guard_starting_pos.y as usize == y {
+                continue;
+            }
+
+            let mut map = puzzle.clone();
+            map[y][x] = '#';
+            maps.push(map);
+        }
+    }
+
+    maps
 }
 
 fn is_within_map(puzzle: &Vec<Vec<char>>, position: &Position) -> bool {
@@ -106,6 +161,7 @@ fn travel(puzzle: &Vec<Vec<char>>, guard: Guard) -> Guard {
         }
     };
 
+    // TODO: Didn't check if this new_dir is clear
     match new_dir {
         Direction::Up => Guard {
             position: Position {
@@ -198,4 +254,13 @@ fn find_guard(puzzle: &Vec<Vec<char>>) -> Option<Guard> {
 
 fn to_matrix(puzzle: String) -> Vec<Vec<char>> {
     puzzle.lines().map(|line| line.chars().collect()).collect()
+}
+
+fn print_map(map: &Vec<Vec<char>>) {
+    for row in map {
+        for letter in row {
+            print!("{letter}");
+        }
+        print!("\n");
+    }
 }
