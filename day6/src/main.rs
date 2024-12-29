@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone)]
 enum Direction {
     Left,
     Right,
@@ -59,53 +59,7 @@ fn is_obsticle(puzzle: &Vec<Vec<char>>, position: &Position) -> bool {
 }
 
 fn travel(puzzle: &Vec<Vec<char>>, guard: Guard) -> Guard {
-    let new_dir = match guard.direction {
-        Direction::Up => {
-            let pos_above = Position {
-                x: guard.position.x,
-                y: guard.position.y - 1,
-            };
-            if is_obsticle(puzzle, &pos_above) {
-                rotate_direction(Direction::Up)
-            } else {
-                Direction::Up
-            }
-        }
-        Direction::Right => {
-            let pos_above = Position {
-                x: guard.position.x + 1,
-                y: guard.position.y,
-            };
-            if is_obsticle(puzzle, &pos_above) {
-                rotate_direction(Direction::Right)
-            } else {
-                Direction::Right
-            }
-        }
-        Direction::Down => {
-            let pos_above = Position {
-                x: guard.position.x,
-                y: guard.position.y + 1,
-            };
-            if is_obsticle(puzzle, &pos_above) {
-                rotate_direction(Direction::Down)
-            } else {
-                Direction::Down
-            }
-        }
-        Direction::Left => {
-            let pos_above = Position {
-                x: guard.position.x - 1,
-                y: guard.position.y,
-            };
-            if is_obsticle(puzzle, &pos_above) {
-                rotate_direction(Direction::Left)
-            } else {
-                Direction::Left
-            }
-        }
-    };
-
+    let new_dir = find_clear_dir(&guard.direction, &guard.position, puzzle);
     match new_dir {
         Direction::Up => Guard {
             position: Position {
@@ -135,6 +89,60 @@ fn travel(puzzle: &Vec<Vec<char>>, guard: Guard) -> Guard {
             },
             direction: new_dir,
         },
+    }
+}
+
+fn find_clear_dir(
+    direction: &Direction,
+    position: &Position,
+    puzzle: &Vec<Vec<char>>,
+) -> Direction {
+    if !is_obsicle_in_dir(&direction, &position, puzzle) {
+        return direction.clone();
+    }
+
+    let mut cur = rotate_direction(direction.clone());
+    while cur != *direction {
+        if !is_obsicle_in_dir(&cur, &position, puzzle) {
+            return cur;
+        }
+
+        cur = rotate_direction(cur);
+    }
+
+    direction.clone()
+}
+
+fn is_obsicle_in_dir(direction: &Direction, position: &Position, puzzle: &Vec<Vec<char>>) -> bool {
+    match direction {
+        Direction::Up => is_obsticle(
+            puzzle,
+            &Position {
+                x: position.x,
+                y: position.y - 1,
+            },
+        ),
+        Direction::Right => is_obsticle(
+            puzzle,
+            &Position {
+                x: position.x + 1,
+                y: position.y,
+            },
+        ),
+        Direction::Down => is_obsticle(
+            puzzle,
+            &Position {
+                x: position.x,
+                y: position.y + 1,
+            },
+        ),
+        Direction::Left => is_obsticle(
+            puzzle,
+            &Position {
+                x: position.x - 1,
+                y: position.y,
+            },
+        ),
     }
 }
 
