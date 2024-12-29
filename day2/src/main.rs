@@ -9,13 +9,42 @@ fn main() {
         .expect("File should be read")
         .lines()
         .map(|report| report.split(' ').map(|level| level.parse::<i32>().unwrap()))
-        .filter(|report| is_report_safe(report.clone().collect()))
+        .filter(|report| is_report_safe(&report.clone().collect()))
+        .count();
+
+    dbg!(num_safe);
+
+    part_2(filepath);
+}
+
+fn part_2(filepath: &String) {
+    let num_safe = read_to_string(filepath)
+        .expect("File should be read")
+        .lines()
+        .map(|report| report.split(' ').map(|level| level.parse::<i32>().unwrap()))
+        .filter(|report| is_dampenable_report_safe(&report.clone().collect()))
         .count();
 
     dbg!(num_safe);
 }
 
-fn is_report_safe(report: Vec<i32>) -> bool {
+fn is_dampenable_report_safe(report: &Vec<i32>) -> bool {
+    if is_report_safe(report) {
+        return true;
+    }
+
+    for i in 0..report.len() {
+        let mut dampened_report = report.clone();
+        dampened_report.remove(i);
+        if is_report_safe(&dampened_report) {
+            return true;
+        }
+    }
+
+    false
+}
+
+fn is_report_safe(report: &Vec<i32>) -> bool {
     if report[1] == report[0] || (report[1] - report[0]).abs() > 3 {
         return false;
     }
