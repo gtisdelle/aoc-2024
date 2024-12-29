@@ -25,7 +25,7 @@ fn main() {
     let path = &args[1];
     let puzzle = std::fs::read_to_string(path).expect("file should be read to a string");
 
-    // _part_1(puzzle);
+    //_part_1(puzzle);
     part_2(puzzle);
 }
 
@@ -65,8 +65,8 @@ fn part_2(puzzle: String) {
             // dbg!(&guard);
             if states.contains(&(guard.position.x, guard.position.y, guard.clone().direction)) {
                 cycle_count += 1;
-                print_map(&map);
-                println!();
+                //print_map(&map);
+                //println!();
                 break;
             }
 
