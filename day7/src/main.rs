@@ -4,6 +4,7 @@ use std::str::FromStr;
 enum Operator {
     Add,
     Multiply,
+    Concat,
 }
 
 #[derive(Debug)]
@@ -97,6 +98,13 @@ fn can_eval_rec(
         next.push(Operator::Add);
         can_eval_rec(target, numbers, i + 1, next, results);
     }
+
+    let next_concat = eval(cur_eval, numbers[i], &Operator::Concat);
+    if next_concat <= target {
+        let mut next = acc.clone();
+        next.push(Operator::Concat);
+        can_eval_rec(target, numbers, i + 1, next, results);
+    }
 }
 
 fn eval_acc(acc: &[Operator], numbers: &Vec<u64>) -> u64 {
@@ -114,5 +122,6 @@ fn eval(a: u64, b: u64, op: &Operator) -> u64 {
     match op {
         Operator::Add => a + b,
         Operator::Multiply => a * b,
+        Operator::Concat => (a.to_string() + &b.to_string()).parse().unwrap(),
     }
 }
