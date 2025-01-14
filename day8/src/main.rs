@@ -39,9 +39,9 @@ fn main() {
     }
 
     let mut antinodes: HashSet<Coordinates> = HashSet::new();
-    for (_, all_a) in antenna_index {
-        for coordinates in all_a.iter() {
-            for other in all_a.iter().filter(|x| *x != coordinates) {
+    for (_, antennas) in antenna_index {
+        for coordinates in antennas.iter() {
+            for other in antennas.iter().filter(|x| *x != coordinates) {
                 // let antinode = calculate_antinode(&map, coordinates, other);
                 // if let Some(a) = antinode {
                 //     antinodes.insert(a);
