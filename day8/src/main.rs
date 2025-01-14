@@ -3,7 +3,7 @@ use std::{
     fs::read_to_string,
 };
 
-#[derive(Debug, PartialEq, Hash, Eq)]
+#[derive(Debug, PartialEq, Hash, Eq, Clone)]
 struct Coordinates {
     x: usize,
     y: usize,
@@ -42,15 +42,36 @@ fn main() {
     for (_, all_a) in antenna_index {
         for coordinates in all_a.iter() {
             for other in all_a.iter().filter(|x| *x != coordinates) {
-                let antinode = calculate_antinode(&map, coordinates, other);
-                if let Some(a) = antinode {
-                    antinodes.insert(a);
-                }
+                // let antinode = calculate_antinode(&map, coordinates, other);
+                // if let Some(a) = antinode {
+                //     antinodes.insert(a);
+                // }
+                let resonating = calculate_antinodes_with_resonance(&map, coordinates, other);
+                antinodes.extend(resonating);
             }
         }
     }
 
-    dbg!(&antinodes, antinodes.len());
+    dbg!(/*&antinodes,*/ antinodes.len());
+}
+
+fn calculate_antinodes_with_resonance(
+    map: &Vec<Vec<char>>,
+    a: &Coordinates,
+    b: &Coordinates,
+) -> Vec<Coordinates> {
+    let mut result = Vec::new();
+    result.push(a.clone());
+    let mut prev = a.clone();
+    let mut cur = calculate_antinode(map, a, b);
+    while cur.is_some() {
+        result.push(cur.clone().unwrap());
+        let next = calculate_antinode(map, &cur.clone().unwrap(), &prev);
+        prev = cur.clone().unwrap();
+        cur = next;
+    }
+
+    result
 }
 
 fn calculate_antinode(
